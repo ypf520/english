@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选词填空合集（4个单元）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft Yahei', Arial, sans-serif;
+        }
+        body {
+            padding: 2rem 1rem;
+            background-color: #f5f7fa;
+            color: #2d3748;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        /* 标题样式 */
+        .page-title {
+            text-align: center;
+            font-size: 1.8rem;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        /* 选项卡样式 */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            background-color: #4299e1;
+            color: white;
+            border-color: #4299e1;
+        }
+        .tab-btn:hover:not(.active) {
+            background-color: #f8fafc;
+        }
+        /* 单元内容容器 */
+        .tab-content {
+            display: none;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* 主操作区（单词池+题目区） */
+        .main-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 2rem;
+        }
+        /* 左侧单词池 */
+        .word-panel {
+            flex: 0 0 280px;
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+        .word-panel h3 {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid #4299e1;
+        }
+        .reset-btn {
+            width: 100%;
+            padding: 0.7rem;
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 1.2rem;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .reset-btn:hover {
+            background-color: #c53030;
+        }
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+        }
+        .word-item {
+            padding: 0.7rem 1rem;
+            background-color: #4299e1;
+            color: white;
+            border-radius: 6px;
+            cursor: grab;
+            transition: all 0.2s;
+            user-select: none;
+            font-size: 0.9rem;
+        }
+        .word-item:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+        .word-item.disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        /* 右侧题目区 */
+        .question-panel {
+            flex: 1;
+            min-width: 0;
+            padding: 0 1rem;
+        }
+        .question-panel h3 {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid #38b2ac;
+        }
+        .question-list {
+            list-style: none;
+            padding: 0;
+        }
+        .question-item {
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            line-height: 2;
+            color: #4a5568;
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+        }
+        .question-num {
+            font-weight: 600;
+            color: #2d3748;
+            width: 2.5rem;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .question-content {
+            flex: 1;
+            width: calc(100% - 3.5rem);
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+        .drop-zone {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            max-width: 200px;
+            height: 2.4rem;
+            margin: 0 0.4rem;
+            border: 2px dashed #9f7aea;
+            border-radius: 6px;
+            color: #718096;
+            transition: all 0.2s;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+        .drop-zone.active {
+            border-color: #38b2ac;
+            background-color: #f0f8fb;
+        }
+        .drop-zone.filled {
+            border-style: solid;
+            background-color: #fef7fb;
+            color: #2d3748;
+            font-weight: 500;
+            cursor: grab;
+        }
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .main-wrap {
+                flex-direction: column;
+                padding: 1.5rem;
+            }
+            .word-panel {
+                width: 100%;
+                flex: none;
+            }
+            .question-panel {
+                padding: 1rem 0 0 0;
+            }
+            .question-item {
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+            .question-num {
+                width: 100%;
+                text-align: left;
+                margin-bottom: 0.3rem;
+            }
+            .question-content {
+                width: 100%;
+            }
+            .drop-zone {
+                min-width: 120px;
+                margin: 0.3rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="page-title">选词填空合集（4个单元）</h2>
+        
+        <!-- 选项卡导航 -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="unit1">Unit 1 Industry & Environment</button>
+            <button class="tab-btn" data-tab="unit2">Unit 2 Text A</button>
+            <button class="tab-btn" data-tab="unit3">Unit 3 Sustainable Development</button>
+            <button class="tab-btn" data-tab="unit4">Unit 4 Music Representation</button>
+        </div>
+
+        <!-- Unit 1 内容 -->
+        <div class="tab-content active" id="unit1">
+            <div class="main-wrap">
+                <!-- 单词池 -->
+                <div class="word-panel">
+                    <h3>可拖拽单词库</h3>
+                    <button class="reset-btn" data-reset="unit1">重置本单元答案</button>
+                    <div class="word-list">
+                        <div class="word-item" draggable="true" data-word="arid">arid</div>
+                        <div class="word-item" draggable="true" data-word="degradation">degradation</div>
+                        <div class="word-item" draggable="true" data-word="infrastructure">infrastructure</div>
+                        <div class="word-item" draggable="true" data-word="variability">variability</div>
+                        <div class="word-item" draggable="true" data-word="restoration">restoration</div>
+                        <div class="word-item" draggable="true" data-word="humidity">humidity</div>
+                        <div class="word-item" draggable="true" data-word="latitudinal">latitudinal</div>
+                        <div class="word-item" draggable="true" data-word="precipitation">precipitation</div>
+                        <div class="word-item" draggable="true" data-word="ecosystem">ecosystem</div>
+                        <div class="word-item" draggable="true" data-word="deforestation">deforestation</div>
+                    </div>
+                </div>
+                <!-- 题目区 -->
+                <div class="question-panel">
+                    <h3>选词填空（拖拽单词至空白处，可拖出重新选择）</h3>
+                    <ul class="question-list">
+                        <li class="question-item">
+                            <span class="question-num">(1)</span>
+                            <div class="question-content">
+                                The climate in <div class="drop-zone" data-target="unit1-1" draggable="true"></div> regions often requires special water management techniques to support agriculture.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(2)</span>
+                            <div class="question-content">
+                                <div class="drop-zone" data-target="unit1-2" draggable="true"></div> in rainfall patterns can cause significant challenges for farmers in terms of crop production.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(3)</span>
+                            <div class="question-content">
+                                Urban development requires solid <div class="drop-zone" data-target="unit1-3" draggable="true"></div> to support transportation, communication, and public services.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(4)</span>
+                            <div class="question-content">
+                                Changes in <div class="drop-zone" data-target="unit1-4" draggable="true"></div> (distribution) can lead to significant shifts in biodiversity across different regions.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(5)</span>
+                            <div class="question-content">
+                                Measures for the <div class="drop-zone" data-target="unit1-5" draggable="true"></div> of degraded ecosystems must be taken to reverse the damage caused by human activities.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(6)</span>
+                            <div class="question-content">
+                                High levels of <div class="drop-zone" data-target="unit1-6" draggable="true"></div> in tropical regions contribute to the rapid growth of plants and crops.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(7)</span>
+                            <div class="question-content">
+                                Soil <div class="drop-zone" data-target="unit1-7" draggable="true"></div> is a key issue in areas affected by overgrazing and unsustainable agricultural practices.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(8)</span>
+                            <div class="question-content">
+                                <div class="drop-zone" data-target="unit1-8" draggable="true"></div> levels have dropped significantly in the region, leading to drought.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(9)</span>
+                            <div class="question-content">
+                                The <div class="drop-zone" data-target="unit1-9" draggable="true"></div> in this forested area is rich, supporting a wide variety of plant and animal life.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(10)</span>
+                            <div class="question-content">
+                                Large-scale <div class="drop-zone" data-target="unit1-10" draggable="true"></div> control projects have been implemented to reduce the pressure on natural resources.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unit 2 内容（优化后版本） -->
+        <div class="tab-content" id="unit2">
+            <div class="main-wrap">
+                <!-- 单词池 -->
+                <div class="word-panel">
+                    <h3>可拖拽单词库</h3>
+                    <button class="reset-btn" data-reset="unit2">重置本单元答案</button>
+                    <div class="word-list">
+                        <div class="word-item" draggable="true" data-word="cognitive">cognitive</div>
+                        <div class="word-item" draggable="true" data-word="empirical">empirical</div>
+                        <div class="word-item" draggable="true" data-word="psychological">psychological</div>
+                        <div class="word-item" draggable="true" data-word="engagement">engagement</div>
+                        <div class="word-item" draggable="true" data-word="framework">framework</div>
+                        <div class="word-item" draggable="true" data-word="interactive">interactive</div>
+                        <div class="word-item" draggable="true" data-word="modulation">modulation</div>
+                        <div class="word-item" draggable="true" data-word="initial">initial</div>
+                        <div class="word-item" draggable="true" data-word="rapport">rapport</div>
+                        <div class="word-item" draggable="true" data-word="antecedent">antecedent</div>
+                    </div>
+                </div>
+                <!-- 题目区 -->
+                <div class="question-panel">
+                    <h3>选词填空（拖拽单词至空白处，可拖出重新选择）</h3>
+                    <ul class="question-list">
+                        <li class="question-item">
+                            <span class="question-num">(1)</span>
+                            <div class="question-content">
+                                The research study used an <div class="drop-zone" data-target="unit2-1" draggable="true"></div> approach and was based on real-world data.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(2)</span>
+                            <div class="question-content">
+                                Building a positive <div class="drop-zone" data-target="unit2-2" draggable="true"></div> between teachers and students is essential for fostering a supportive learning environment.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(3)</span>
+                            <div class="question-content">
+                                The development of <div class="drop-zone" data-target="unit2-3" draggable="true"></div> skills allows individuals to think critically and solve complex problems.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(4)</span>
+                            <div class="question-content">
+                                In the introduction of the paper, the author provides an <div class="drop-zone" data-target="unit2-4" draggable="true"></div> overview of the research problem before delving into the detailed analysis.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(5)</span>
+                            <div class="question-content">
+                                The teacher's <div class="drop-zone" data-target="unit2-5" draggable="true"></div> in the class was noticeable, as students actively participated in discussions and activities.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(6)</span>
+                            <div class="question-content">
+                                Effective <div class="drop-zone" data-target="unit2-6" draggable="true"></div> of students' emotional responses can help improve classroom behavior and overall learning.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(7)</span>
+                            <div class="question-content">
+                                The new <div class="drop-zone" data-target="unit2-7" draggable="true"></div> introduced by the research group helped structure the study and provide a clear set of guidelines.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(8)</span>
+                            <div class="question-content">
+                                Teachers often use an <div class="drop-zone" data-target="unit2-8" draggable="true"></div> approach to engage students, using technology and group work to enhance interaction.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(9)</span>
+                            <div class="question-content">
+                                The <div class="drop-zone" data-target="unit2-9" draggable="true"></div> factors in the study played a role in the outcomes, as the researchers considered previous data.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(10)</span>
+                            <div class="question-content">
+                                Having a strong sense of <div class="drop-zone" data-target="unit2-10" draggable="true"></div> enables students to believe in their own capabilities and push through challenges.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unit 3 内容 -->
+        <div class="tab-content" id="unit3">
+            <div class="main-wrap">
+                <!-- 单词池 -->
+                <div class="word-panel">
+                    <h3>可拖拽单词库</h3>
+                    <button class="reset-btn" data-reset="unit3">重置本单元答案</button>
+                    <div class="word-list">
+                        <div class="word-item" draggable="true" data-word="consensus">consensus</div>
+                        <div class="word-item" draggable="true" data-word="dimension">dimension</div>
+                        <div class="word-item" draggable="true" data-word="aggravate">aggravate</div>
+                        <div class="word-item" draggable="true" data-word="normalize">normalize</div>
+                        <div class="word-item" draggable="true" data-word="opine">opine</div>
+                        <div class="word-item" draggable="true" data-word="mandatory">mandatory</div>
+                        <div class="word-item" draggable="true" data-word="eradication">eradication</div>
+                        <div class="word-item" draggable="true" data-word="provision">provision</div>
+                        <div class="word-item" draggable="true" data-word="governance">governance</div>
+                        <div class="word-item" draggable="true" data-word="harness">harness</div>
+                    </div>
+                </div>
+                <!-- 题目区 -->
+                <div class="question-panel">
+                    <h3>选词填空（拖拽单词至空白处，可拖出重新选择）</h3>
+                    <ul class="question-list">
+                        <li class="question-item">
+                            <span class="question-num">(1)</span>
+                            <div class="question-content">
+                                He emphasized the company's commitment to high standards of corporate <div class="drop-zone" data-target="unit3-1" draggable="true"></div>.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(2)</span>
+                            <div class="question-content">
+                                Her job added a new <div class="drop-zone" data-target="unit3-2" draggable="true"></div> to her life.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(3)</span>
+                            <div class="question-content">
+                                The headmistress <div class="drop-zone" data-target="unit3-3" draggable="true"></div> that the outing would make a nice change for them.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(4)</span>
+                            <div class="question-content">
+                                There seems to be a <div class="drop-zone" data-target="unit3-4" draggable="true"></div> that the plan should be rejected.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(5)</span>
+                            <div class="question-content">
+                                Small businesses are advised to make adequate <div class="drop-zone" data-target="unit3-5" draggable="true"></div> against bad debts.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(6)</span>
+                            <div class="question-content">
+                                Last year, we launched an aggressive new strategy for polio <div class="drop-zone" data-target="unit3-6" draggable="true"></div>.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(7)</span>
+                            <div class="question-content">
+                                Military intervention will only <div class="drop-zone" data-target="unit3-7" draggable="true"></div> the conflict even further.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(8)</span>
+                            <div class="question-content">
+                                We must <div class="drop-zone" data-target="unit3-8" draggable="true"></div> the skill and creativity of our workforce.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(9)</span>
+                            <div class="question-content">
+                                The two countries agreed to <div class="drop-zone" data-target="unit3-9" draggable="true"></div> relations.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(10)</span>
+                            <div class="question-content">
+                                It is <div class="drop-zone" data-target="unit3-10" draggable="true"></div> for blood banks to test all donated blood for the virus.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unit 4 内容 -->
+        <div class="tab-content" id="unit4">
+            <div class="main-wrap">
+                <!-- 单词池 -->
+                <div class="word-panel">
+                    <h3>可拖拽单词库</h3>
+                    <button class="reset-btn" data-reset="unit4">重置本单元答案</button>
+                    <div class="word-list">
+                        <div class="word-item" draggable="true" data-word="homogeneous">homogeneous</div>
+                        <div class="word-item" draggable="true" data-word="aesthetic">aesthetic</div>
+                        <div class="word-item" draggable="true" data-word="philosophy">philosophy</div>
+                        <div class="word-item" draggable="true" data-word="cognitive">cognitive</div>
+                        <div class="word-item" draggable="true" data-word="husbandry">husbandry</div>
+                        <div class="word-item" draggable="true" data-word="spiritual">spiritual</div>
+                        <div class="word-item" draggable="true" data-word="ceremonial">ceremonial</div>
+                        <div class="word-item" draggable="true" data-word="anthropologic">anthropologic</div>
+                        <div class="word-item" draggable="true" data-word="physiological">physiological</div>
+                        <div class="word-item" draggable="true" data-word="deflection">deflection</div>
+                    </div>
+                </div>
+                <!-- 题目区 -->
+                <div class="question-panel">
+                    <h3>选词填空（拖拽单词至空白处，可拖出重新选择）</h3>
+                    <ul class="question-list">
+                        <li class="question-item">
+                            <span class="question-num">(1)</span>
+                            <div class="question-content">
+                                Modern <div class="drop-zone" data-target="unit4-1" draggable="true"></div> techniques have significantly increased the productivity of farms.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(2)</span>
+                            <div class="question-content">
+                                The king wore a <div class="drop-zone" data-target="unit4-2" draggable="true"></div> robe during the coronation.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(3)</span>
+                            <div class="question-content">
+                                The <div class="drop-zone" data-target="unit4-3" draggable="true"></div> of the ball by the goalkeeper saved the team from losing the match.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(4)</span>
+                            <div class="question-content">
+                                Many people find <div class="drop-zone" data-target="unit4-4" draggable="true"></div> comfort in meditation and prayer.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(5)</span>
+                            <div class="question-content">
+                                The architect focused on the <div class="drop-zone" data-target="unit4-5" draggable="true"></div> appeal of the building, ensuring it was both functional and beautiful.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(6)</span>
+                            <div class="question-content">
+                                The study revealed fascinating details about ancient <div class="drop-zone" data-target="unit4-6" draggable="true"></div> burial practices.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(7)</span>
+                            <div class="question-content">
+                                The mixture was completely <div class="drop-zone" data-target="unit4-7" draggable="true"></div> with no visible separation of its components.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(8)</span>
+                            <div class="question-content">
+                                Playing chess can improve <div class="drop-zone" data-target="unit4-8" draggable="true"></div> abilities such as memory and problem-solving skills.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(9)</span>
+                            <div class="question-content">
+                                The doctor explained the <div class="drop-zone" data-target="unit4-9" draggable="true"></div> effects of stress on the human body.
+                            </div>
+                        </li>
+                        <li class="question-item">
+                            <span class="question-num">(10)</span>
+                            <div class="question-content">
+                                Her <div class="drop-zone" data-target="unit4-10" draggable="true"></div> of life is to find joy in the simplest things.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局拖拽数据
+        let dragData = {
+            word: null,
+            source: null, // 'word' 单词池 / 'drop' 放置区
+            el: null,
+            unit: null // 当前操作的单元
+        };
+
+        // 1. 选项卡切换功能
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有激活状态
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                // 激活当前选项卡
+                btn.classList.add('active');
+                const tabId = btn.dataset.tab;
+                document.getElementById(tabId).classList.add('active');
+                // 更新当前单元
+                dragData.unit = tabId;
+            });
+        });
+
+        // 2. 单词池拖拽事件（所有单元通用）
+        document.querySelectorAll('.word-item').forEach(word => {
+            word.addEventListener('dragstart', (e) => {
+                if (word.classList.contains('disabled')) return;
+                // 获取当前单词所属单元
+                const unit = word.closest('.tab-content').id;
+                dragData = {
+                    word: word.dataset.word,
+                    source: 'word',
+                    el: word,
+                    unit: unit
+                };
+                e.dataTransfer.setData('text/plain', dragData.word);
+                setTimeout(() => word.style.opacity = '0.5', 0);
+            });
+
+            word.addEventListener('dragend', () => {
+                word.style.opacity = '1';
+                dragData = { word: null, source: null, el: null, unit: null };
+            });
+        });
+
+        // 3. 放置区拖拽事件（支持拖出，所有单元通用）
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            // 拖出放置区的单词
+            zone.addEventListener('dragstart', (e) => {
+                if (!zone.classList.contains('filled')) return;
+                const unit = zone.closest('.tab-content').id;
+                dragData = {
+                    word: zone.textContent.trim(),
+                    source: 'drop',
+                    el: zone,
+                    unit: unit
+                };
+                e.dataTransfer.setData('text/plain', dragData.word);
+                setTimeout(() => zone.style.opacity = '0.5', 0);
+            });
+
+            zone.addEventListener('dragend', () => {
+                zone.style.opacity = '1';
+                dragData = { word: null, source: null, el: null, unit: null };
+            });
+
+            // 允许放置
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (dragData.word) zone.classList.add('active');
+            });
+
+            // 离开放置区
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('active');
+            });
+
+            // 放置单词
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('active');
+                const word = dragData.word;
+                const targetUnit = zone.closest('.tab-content').id;
+                if (!word || dragData.unit !== targetUnit) return; // 仅允许同单元拖拽
+
+                // 场景1：从单词池拖入
+                if (dragData.source === 'word') {
+                    // 若当前区有单词，先恢复到单词池
+                    if (zone.classList.contains('filled')) {
+                        const oldWord = zone.textContent.trim();
+                        targetUnit && document.querySelectorAll(`#${targetUnit} .word-item`).forEach(w => {
+                            if (w.dataset.word === oldWord) {
+                                w.classList.remove('disabled');
+                                w.draggable = true;
+                            }
+                        });
+                    }
+                    // 填充新单词
+                    zone.textContent = word;
+                    zone.classList.add('filled');
+                    // 禁用单词池中的该单词
+                    dragData.el.classList.add('disabled');
+                    dragData.el.draggable = false;
+                }
+
+                // 场景2：从一个放置区拖到另一个
+                if (dragData.source === 'drop') {
+                    const sourceZone = dragData.el;
+                    // 目标区有单词则恢复
+                    if (zone.classList.contains('filled')) {
+                        const oldWord = zone.textContent.trim();
+                        targetUnit && document.querySelectorAll(`#${targetUnit} .word-item`).forEach(w => {
+                            if (w.dataset.word === oldWord) {
+                                w.classList.remove('disabled');
+                                w.draggable = true;
+                            }
+                        });
+                    }
+                    // 填充新单词到目标区
+                    zone.textContent = word;
+                    zone.classList.add('filled');
+                    // 清空源放置区
+                    sourceZone.textContent = '';
+                    sourceZone.classList.remove('filled');
+                }
+            });
+        });
+
+        // 4. 拖到空白处恢复单词
+        document.body.addEventListener('dragover', (e) => e.preventDefault());
+        document.body.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (dragData.source !== 'drop' || !dragData.unit) return;
+            
+            // 清空源放置区
+            dragData.el.textContent = '';
+            dragData.el.classList.remove('filled');
+            
+            // 恢复单词到对应单元的单词池
+            document.querySelectorAll(`#${dragData.unit} .word-item`).forEach(w => {
+                if (w.dataset.word === dragData.word) {
+                    w.classList.remove('disabled');
+                    w.draggable = true;
+                }
+            });
+            dragData = { word: null, source: null, el: null, unit: null };
+        });
+
+        // 5. 重置按钮功能（按单元重置）
+        document.querySelectorAll('.reset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const unit = btn.dataset.reset;
+                // 清空当前单元所有放置区
+                document.querySelectorAll(`#${unit} .drop-zone`).forEach(zone => {
+                    zone.textContent = '';
+                    zone.classList.remove('filled', 'active');
+                });
+                // 恢复当前单元所有单词
+                document.querySelectorAll(`#${unit} .word-item`).forEach(word => {
+                    word.classList.remove('disabled');
+                    word.draggable = true;
+                });
+            });
+        });
+
+        // 初始化：默认激活Unit1
+        dragData.unit = 'unit1';
+    </script>
+</body>
+</html>
