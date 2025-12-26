@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz 2 A1: AI & L2 Emotion Study</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        body {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
+            background: #f8f9fa;
+        }
+        h1 {
+            text-align: center;
+            color: #212529;
+            padding: 20px 0;
+            border-bottom: 2px solid #0d6efd;
+            margin-bottom: 30px;
+        }
+        .quiz-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .question h3 {
+            color: #343a40;
+            font-size: 17px;
+            margin-bottom: 12px;
+        }
+        .options {
+            margin-left: 15px;
+        }
+        .option {
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        .option input {
+            margin-right: 8px;
+        }
+        #submit-btn {
+            display: block;
+            width: 220px;
+            height: 45px;
+            margin: 0 auto 30px;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #submit-btn:hover {
+            background: #0b5ed7;
+        }
+        #result-container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+        #result-container h2 {
+            text-align: center;
+            color: #212529;
+            margin-bottom: 20px;
+        }
+        .score {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 25px;
+        }
+        .correct {
+            color: #198754;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .question-result {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quiz 2 A1</h1>
+
+    <div class="quiz-container" id="quiz-container">
+        <!-- 题目将通过JS动态渲染 -->
+    </div>
+
+    <button id="submit-btn">Submit Answers</button>
+
+    <div id="result-container">
+        <h2>Quiz Results</h2>
+        <div class="score" id="score-display"></div>
+        <div id="answer-details"></div>
+    </div>
+
+    <script>
+        // 题库：100%还原图片原题
+        const quizQuestions = [
+            {
+                question: "1. Which one of the following subheadings should not appear in the methods section of a research paper?",
+                options: [
+                    "participants",
+                    "implications",
+                    "data collection",
+                    "procedures"
+                ],
+                correctAnswer: "implications"
+            },
+            {
+                question: '2. What linguistic features of the method section can be observed in the following sentences: "To obtain richer data about EFL learners’ perceptions, a semi-structured interview was used as a complementary tool in this study. The interview questions were developed by the researchers."',
+                options: [
+                    "passive voice and present tense",
+                    "active voice and present tense",
+                    "passive voice and past tense",
+                    "active voice and past tense"
+                ],
+                correctAnswer: "passive voice and past tense"
+            },
+            {
+                question: "3. Which one of the following groups of expressions can be used to describe the research procedure?",
+                options: [
+                    "sth be done using A/ sth be done based on A/ sth be done with A",
+                    "the methods allows us to demonstrate / the method is capable of providing",
+                    "The methods of X was first developed by / the method of X was first applied by",
+                    "The methods adopted in this study differs from..."
+                ],
+                correctAnswer: "sth be done using A/ sth be done based on A/ sth be done with A"
+            },
+            {
+                question: "4. What are the primary functions of the Findings section (4.1 & 4.2) in this research paper?",
+                options: [
+                    "To discuss the limitations of the study and suggest future research",
+                    "To describe the AI tools used and present the theoretical framework",
+                    "To answer the research questions and objectively report key findings from the data",
+                    "To interpret the meaning of the results and argue for their significance"
+                ],
+                correctAnswer: "To answer the research questions and objectively report key findings from the data"
+            },
+            {
+                question: "5. How is the information primarily organized within the Findings section (4.1 and 4.2)?",
+                options: [
+                    "By the alphabetical order of emotions and strategies",
+                    "By the intensity of the emotions experienced",
+                    "By the order of appearance of the research questions",
+                    "By grouping findings according to specific AI applications used"
+                ],
+                correctAnswer: "By the order of appearance of the research questions"
+            },
+            {
+                question: "6. Within the category of Positive Emotions (section 4.1), how are the core quantitative results specifically presented?",
+                options: [
+                    "As percentages showing the proportion of students experiencing each emotion",
+                    "As a list of emotions in order of frequency with explicit counts (e.g., interest (247))",
+                    "As averages calculated from Likert scale responses",
+                    "As complex statistical models comparing emotion frequencies"
+                ],
+                correctAnswer: "As a list of emotions in order of frequency with explicit counts (e.g., interest (247))"
+            },
+            {
+                question: "7. Beyond listing emotions and frequencies, what specific type of evidence is used to support findings and illustrate the reasons or student perceptions behind emotions in section 4.1?",
+                options: [
+                    "References to previous studies on AI in education",
+                    "Descriptions of the researchers’ observations",
+                    "Statistical correlations between emotions and learning outcomes",
+                    "Direct quotes from participants (e.g., Student #11) exemplifying emotions and providing insight into reasons/perceptions"
+                ],
+                correctAnswer: "Direct quotes from participants (e.g., Student #11) exemplifying emotions and providing insight into reasons/perceptions"
+            },
+            {
+                question: "8. What is the main function of the figures (e.g., Fig. 2, Fig. 3, Fig. 4) in this Findings section, specifically presenting information more effectively than text?",
+                options: [
+                    "To list the names of the student participants",
+                    "To provide detailed descriptions of the AI tools",
+                    "To visually present/summarize frequency distributions or rankings and enhance readability",
+                    "To present the researchers’ subjective interpretations of the data"
+                ],
+                correctAnswer: "To visually present/summarize frequency distributions or rankings and enhance readability"
+            },
+            {
+                question: "9. How are the findings on emotion regulation strategies in section 4.2 primarily categorized?",
+                options: [
+                    "By the level of difficulty to implement them",
+                    "By whether they are used before experiencing an emotion or after experiencing it",
+                    "By their effectiveness in reducing negative emotions only",
+                    "By the specific classroom setting where they were observed"
+                ],
+                correctAnswer: "By whether they are used before experiencing an emotion or after experiencing it"
+            },
+            {
+                question: "10. Which one of the following patterns can be used to show the location of the figures and tables?",
+                options: [
+                    "Strong evidence of X was found when...",
+                    "The results obtained from the preliminary analysis of Y are shown in table 1",
+                    "The most striking results to emerge from the data is that...",
+                    "Regression analysis was used to predict that..."
+                ],
+                correctAnswer: "The results obtained from the preliminary analysis of Y are shown in table 1"
+            },
+            {
+                question: "11. According to the text, which physiological response strategy is specifically mentioned as being used by students to manage stress in AI-based classes?",
+                options: [
+                    "Cognitive reappraisal",
+                    "Situation modification",
+                    "Frequent drinking of water (Student #50)",
+                    "Attention deployment"
+                ],
+                correctAnswer: "Frequent drinking of water (Student #50)"
+            },
+            {
+                question: "12. What is the PRIMARY purpose of the first few sentences in this discussion section?",
+                options: [
+                    "To list the research questions",
+                    "To summarize the main findings of the study",
+                    "To acknowledge the limitations of the research",
+                    "To propose future research directions"
+                ],
+                correctAnswer: "To summarize the main findings of the study"
+            },
+            {
+                question: '13. When the authors state "The findings corroborate CVT and PP", what function does this sentence serve?',
+                options: [
+                    "It introduces a new theoretical framework",
+                    "It places the findings within the context of existing theories, showing consistency",
+                    "It highlights a limitation of the current study",
+                    "It explains the research methodology of the study"
+                ],
+                correctAnswer: "It places the findings within the context of existing theories, showing consistency"
+            },
+            {
+                question: "14. Which phrase BEST demonstrates the authors explaining their findings?",
+                options: [
+                    "\"The findings corroborate CVT and PP...\"",
+                    "\"This study extends TAM by adding an emotional dimension...\"",
+                    "\"An explanation for the findings could be the very nature of L2 education...\"",
+                    "\"The findings also revealed that Chinese EFL learners engaged different strategies...\""
+                ],
+                correctAnswer: "\"An explanation for the findings could be the very nature of L2 education...\""
+            },
+            {
+                question: '15. What is the function of the paragraph discussing "cognitive change", "situation modification", "deep breath", etc.?',
+                options: [
+                    "To describe the research methodology",
+                    "To present underpinning findings of the study (emotion regulation strategies)",
+                    "To list the limitations of the AI technology used",
+                    "To argue against the use of AI in education"
+                ],
+                correctAnswer: "To present underpinning findings of the study (emotion regulation strategies)"
+            },
+            {
+                question: "16. Which of the following sentences from the discussion uses the origin (来源/出处) to qualify the claim about the origin of emotion regulation strategies?",
+                options: [
+                    "\"They utilized ‘cognitive change’, ‘situation modification’, and ‘attention deployment’... from their language learning skills acquired in other subjects...\"",
+                    "\"The findings also echo those of An et al. (2021) and Zhao et al. (2022)…\"",
+                    "\"Although this study provided fresh insights into AI and PP, it did not consider…\"",
+                    "\"The findings can help EFL students understand common emotional experiences…\""
+                ],
+                correctAnswer: "\"They utilized ‘cognitive change’, ‘situation modification’, and ‘attention deployment’... from their language learning skills acquired in other subjects...\""
+            },
+            {
+                question: "17. The mention of “the role of discipline proficiency level and demographic factors” being “not considered” serves what purpose in the discussion?",
+                options: [
+                    "To highlight a strength of the study design",
+                    "To acknowledge a limitation of the current study",
+                    "To summarize the main findings",
+                    "To explain the theoretical framework"
+                ],
+                correctAnswer: "To acknowledge a limitation of the current study"
+            },
+            {
+                question: "18. Which research most clearly suggests directions for future research?",
+                options: [
+                    "\"The findings corroborate CVT and PP…\"",
+                    "\"This study extends TAM by adding an emotional dimension…\"",
+                    "\"A broader replication of the findings could be…\"",
+                    "\"The perceptions of L2 learners regarding AI integration may also be expanded…\""
+                ],
+                correctAnswer: "\"The perceptions of L2 learners regarding AI integration may also be expanded…\""
+            },
+            {
+                question: "19. In a standard research Discussion section, which sequence represents the MOST conventional order of core elements?",
+                options: [
+                    "Key findings → Limitations → Theoretical context → Future research",
+                    "Theoretical context → Key findings → Interpretations → Future research → Limitations",
+                    "Key findings → Theoretical context → Interpretations → Limitations → Future research",
+                    "Limitations → Key findings → Interpretations → Practical implications → Future research"
+                ],
+                correctAnswer: "Key findings → Theoretical context → Interpretations → Limitations → Future research"
+            },
+            {
+                question: '20. What is the function of the following sentences in the conclusion and implications section: "Hence, this study enriches TAM and other educational technology theories.", "Practically, the findings can be used to prepare EFL students…", "School principals may also use this study…"',
+                options: [
+                    "To show the limitations of the study",
+                    "To show the implications and significance of the study",
+                    "To show the conclusion of the study",
+                    "To show the purpose for the study"
+                ],
+                correctAnswer: "To show the implications and significance of the study"
+            }
+        ];
+
+        // 渲染题目到页面
+        const quizContainer = document.getElementById('quiz-container');
+        quizQuestions.forEach((q, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question';
+            questionDiv.id = `question-${index}`;
+
+            // 题干
+            const questionTitle = document.createElement('h3');
+            questionTitle.textContent = q.question;
+            questionDiv.appendChild(questionTitle);
+
+            // 选项
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'options';
+            q.options.forEach(option => {
+                const optionLabel = document.createElement('label');
+                optionLabel.className = 'option';
+                const optionInput = document.createElement('input');
+                optionInput.type = 'radio';
+                optionInput.name = `question-${index}`;
+                optionInput.value = option;
+                optionLabel.appendChild(optionInput);
+                optionLabel.appendChild(document.createTextNode(option));
+                optionsDiv.appendChild(optionLabel);
+                optionsDiv.appendChild(document.createElement('br'));
+            });
+            questionDiv.appendChild(optionsDiv);
+
+            quizContainer.appendChild(questionDiv);
+        });
+
+        // 提交按钮逻辑
+        const submitBtn = document.getElementById('submit-btn');
+        const resultContainer = document.getElementById('result-container');
+        const scoreDisplay = document.getElementById('score-display');
+        const answerDetails = document.getElementById('answer-details');
+
+        submitBtn.addEventListener('click', () => {
+            let correctCount = 0;
+            let detailsHTML = '';
+
+            // 遍历题目判分
+            quizQuestions.forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="question-${index}"]:checked`);
+                const userAnswer = selectedOption ? selectedOption.value : 'No answer';
+                const isCorrect = userAnswer === q.correctAnswer;
+
+                if (isCorrect) correctCount++;
+
+                // 构建结果详情
+                detailsHTML += `
+                    <div class="question-result">
+                        <p><strong>Q${index+1}:</strong> ${q.question}</p>
+                        <p class="${isCorrect ? 'correct' : 'incorrect'}">
+                            Your answer: ${userAnswer}
+                            <br>
+                            Correct answer: ${q.correctAnswer}
+                            ${isCorrect ? ' ✔️' : ' ❌'}
+                        </p>
+                    </div>
+                `;
+            });
+
+            // 显示结果
+            const totalQuestions = quizQuestions.length;
+            scoreDisplay.textContent = `Your Score: ${correctCount}/${totalQuestions} (${(correctCount/totalQuestions*100).toFixed(1)}%)`;
+            answerDetails.innerHTML = detailsHTML;
+            resultContainer.style.display = 'block';
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
